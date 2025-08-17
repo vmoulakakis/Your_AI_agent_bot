@@ -1,19 +1,23 @@
-# 💬 Chatbot template
+# 🛍️ Affiliate eShop (Streamlit)
 
-A simple Streamlit app that shows how to build a chatbot using OpenAI's GPT-3.5.
+A minimal affiliate eShop MVP with:
+- WordPress-like admin area (settings, product importer from JSON feed, blog, users)
+- Public Shop page with affiliate link templating
+- Blog page for SEO content
+- Basic dashboard
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://chatbot-template.streamlit.app/)
+### Run locally
 
-### How to run it on your own machine
+1. Install requirements (user scope if needed):
 
-1. Install the requirements
+```
+python3 -m pip install -r requirements.txt --user --break-system-packages
+```
 
-   ```
-   $ pip install -r requirements.txt
-   ```
+2. Run the app:
 
-2. Run the app
+```
+streamlit run streamlit_app.py
+```
 
-   ```
-   $ streamlit run streamlit_app.py
-   ```
+Open the sidebar to switch pages: Shop, Blog, Dashboard, Admin. Default admin user is `admin`/`admin` (change it in Admin → Users).
