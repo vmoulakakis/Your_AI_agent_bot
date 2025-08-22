@@ -444,3 +444,78 @@ def update_workflow(
     conn = get_connection()
     conn.execute(sql, tuple(params))
     conn.commit()
+
+
+def get_conversation_by_session_id(session_id: str) -> Optional[sqlite3.Row]:
+    conn = get_connection()
+    cur = conn.execute("SELECT * FROM conversations WHERE session_id = ?", (session_id,))
+    return cur.fetchone()
+
+
+def create_conversation(session_id: str, summary: str = "") -> int:
+    conn = get_connection()
+    conn.execute(
+        "INSERT INTO conversations (session_id, summary, created_at, updated_at) VALUES (?,?,?,?)",
+        (session_id, summary, utc_now_iso(), utc_now_iso()),
+    )
+    conn.commit()
+    return int(conn.execute("SELECT last_insert_rowid()").fetchone()[0])
+
+
+def update_conversation_summary(conversation_id: int, summary: str) -> None:
+    conn = get_connection()
+    conn.execute(
+        "UPDATE conversations SET summary = ?, updated_at = ? WHERE id = ?",
+        (summary, utc_now_iso(), conversation_id),
+    )
+    conn.commit()
+
+
+def add_message(conversation_id: int, role: str, content: str) -> int:
+    conn = get_connection()
+    conn.execute(
+        "INSERT INTO messages (conversation_id, role, content, created_at) VALUES (?,?,?,?)",
+        (conversation_id, role, content, utc_now_iso()),
+    )
+    conn.commit()
+    return int(conn.execute("SELECT last_insert_rowid()").fetchone()[0])
+
+
+def list_messages(conversation_id: int, limit: int = 20) -> List[sqlite3.Row]:
+    conn = get_connection()
+    cur = conn.execute(
+        "SELECT * FROM messages WHERE conversation_id = ? ORDER BY id DESC LIMIT ?",
+        (conversation_id, int(limit)),
+    )
+    rows = list(cur.fetchall())
+    rows.reverse()
+    return rows
+
+
+def add_memory(conversation_id: int, content: str, score: float = 1.0) -> int:
+    conn = get_connection()
+    conn.execute(
+        "INSERT INTO memories (conversation_id, content, score, created_at) VALUES (?,?,?,?)",
+        (conversation_id, content, float(score), utc_now_iso()),
+    )
+    conn.commit()
+    return int(conn.execute("SELECT last_insert_rowid()").fetchone()[0])
+
+
+def list_memories(conversation_id: int, top_n: int = 5) -> List[sqlite3.Row]:
+    conn = get_connection()
+    cur = conn.execute(
+        "SELECT * FROM memories WHERE conversation_id = ? ORDER BY score DESC, id DESC LIMIT ?",
+        (conversation_id, int(top_n)),
+    )
+    return list(cur.fetchall())
+
+
+def count_messages(conversation_id: int) -> int:
+    conn = get_connection()
+    cur = conn.execute(
+        "SELECT COUNT(*) FROM messages WHERE conversation_id = ?",
+        (conversation_id,),
+    )
+    row = cur.fetchone()
+    return int(row[0]) if row else 0
