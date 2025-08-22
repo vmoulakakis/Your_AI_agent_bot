@@ -39,11 +39,7 @@ for idx, p in enumerate(products):
         price_text = f"{p['price']:.2f} {p['currency']}"
         st.caption((p["category_name"] or "") + (" · " if p["category_name"] else "") + price_text)
         st.write((p["description"] or "")[:160] + ("…" if p["description"] and len(p["description"]) > 160 else ""))
-        # Build final affiliate target best-effort on the client side as a convenience
-        template = p["affiliate_url_template"] or ""
+        # Track via Redirect page
         aff = st.session_state.get("affiliate_code", "")
-        if template:
-            target = template.replace("{affiliate_code}", aff) if aff else template
-        else:
-            target = "#"
-        st.markdown(f"[Buy now]({target})")
+        redirect_url = f"./Redirect?p={p['slug']}&a={aff}"
+        st.link_button("Buy now", redirect_url)

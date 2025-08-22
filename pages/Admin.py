@@ -21,8 +21,11 @@ TAB_SETTINGS, TAB_PRODUCTS, TAB_BLOG, TAB_USERS = st.tabs([
 with TAB_SETTINGS:
     st.subheader("Site Settings")
     site_name = st.text_input("Site name", value=repo.get_setting("site_name", "Affiliate eShop") or "Affiliate eShop")
+    openai_api_key = st.text_input("OpenAI API key (stored securely in DB)", type="password", value=repo.get_setting("openai_api_key", "") or "")
     if st.button("Save settings"):
         repo.set_setting("site_name", site_name)
+        if openai_api_key:
+            repo.set_setting("openai_api_key", openai_api_key)
         st.success("Settings saved")
 
 with TAB_PRODUCTS:
